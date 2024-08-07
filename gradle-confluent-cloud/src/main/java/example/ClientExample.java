@@ -49,8 +49,16 @@ public class ClientExample {
     String value = "Tião foi a feira";
     Producer<String, String> producer = new KafkaProducer<>(config);
     producer.metrics();
-    Future<RecordMetadata> future = producer.send(new ProducerRecord<>(topic, key, value));
-    producer.metrics();
+    producer.send(new ProducerRecord<>(topic, key, value), new Callback() {
+      @Override
+      public void onCompletion(RecordMetadata metadata, Exception exception) {
+        if(exception == null){
+          System.out.println(String.format("Ocorre erro message: %s cause: s%", exception.getMessage(), exception.getCause()));
+        }
+      }
+    });
+
+
     System.out.println(
       String.format(
         "Produced message to topic = %s key = %s value = %s", topic, key, value
